@@ -10,6 +10,8 @@ from flask import Flask, render_template, request, redirect, url_for
 app = Flask(__name__)
 load_dotenv()
 my_api_key = os.getenv("OPENAI_API_KEY")
+if not my_api_key:
+    raise RuntimeError("OPENAI_API_KEY is not set. Please configure it in Render.")
 client = OpenAI(api_key=my_api_key)
 
 # Global variables to store state
