@@ -1,7 +1,6 @@
 import os
 import base64
 import shutil
-from os import getenv
 from pathlib import Path
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -9,6 +8,9 @@ from pydantic import BaseModel
 from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
+load_dotenv()
+my_api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=my_api_key)
 
 # Global variables to store state
 displayed_text = ""
@@ -51,13 +53,7 @@ def index():
     if 'is_loading' not in globals():
         is_loading = False
 
-    return render_template('index.html',
-                           text=displayed_text,
-                           option=selected_option,
-                           image=image_filename,
-                           audio=audio_filename,
-                           voice=selected_voice,
-                           loading=is_loading)
+    return render_template('index.html', text=displayed_text, option=selected_option, image=image_filename, audio=audio_filename, voice=selected_voice, loading=is_loading)
 
 
 @app.route('/submit', methods=['POST'])
@@ -248,7 +244,4 @@ def ai_text_to_speech(prompt, voice):
 
 
 if __name__ == '__main__':
-    load_dotenv()
-    my_api_key = getenv("OPENAI_API_KEY")
-    client = OpenAI(api_key=my_api_key)
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
