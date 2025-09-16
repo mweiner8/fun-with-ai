@@ -159,7 +159,11 @@ def ai_return_json(prompt):
             ],
             text_format=ProductDesc,
         )
-        return response.output_parsed
+
+        parsed = response.output_parsed
+        # ✅ Return JSON string so Flask can safely store it in session
+        return parsed.model_dump_json(indent=2)
+
     except Exception as e:
         print(f"[ERROR] ai_return_json failed: {e}")
         return f"Error generating structured data: {str(e)}"
