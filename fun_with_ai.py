@@ -29,7 +29,8 @@ def move_image_to_static(source_path, static_dir='static'):
     try:
         shutil.move(source_path, destination_path)
         return destination_path
-    except Exception:
+    except Exception as e:
+        print(e)
         return None
 
 
@@ -153,7 +154,7 @@ def ai_return_json(prompt):
 
         response = client.responses.parse(
             model="gpt-4o-2024-08-06",
-            input=[
+            input=[ # type: ignore[arg-type]
                 {"role": "system", "content": "Extract the product information."},
                 {"role": "user", "content": prompt},
             ],
@@ -186,7 +187,7 @@ def ai_process_uploaded_image(filepath):
             return "Error processing uploaded file"
         response = client.responses.create(
             model="gpt-4.1-mini",
-            input=[{
+            input=[{ # type: ignore[arg-type]
                 "role": "user",
                 "content": [
                     {"type": "input_text", "text": "what's in this image?"},

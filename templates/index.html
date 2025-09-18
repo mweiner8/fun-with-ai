@@ -275,30 +275,59 @@
 
         <div class="input-section">
             <form method="POST" action="/submit" enctype="multipart/form-data" class="input-form" id="mainForm">
+                <label for="processingType"></label>
                 <select name="processing_type" id="processingType" required>
-                    <option value="" disabled {% if not option %}selected{% endif %}>Select Processing Type</option>
-                    <option value="text_generation" {% if option == 'text_generation' %}selected{% endif %}>Text Generation</option>
-                    <option value="image_generation" {% if option == 'image_generation' %}selected{% endif %}>Image Generation</option>
-                    <option value="structured_data" {% if option == 'structured_data' %}selected{% endif %}>Structured Data Output (JSON)</option>
-                    <option value="vision_capabilities" {% if option == 'vision_capabilities' %}selected{% endif %}>Vision Capabilities</option>
-                    <option value="speech_to_text" {% if option == 'speech_to_text' %}selected{% endif %}>Speech-to-Text</option>
-                    <option value="text_to_speech" {% if option == 'text_to_speech' %}selected{% endif %}>Text-to-Speech</option>
+                    {% if not option %}
+                        <option value="" disabled selected>Select Processing Type</option>
+                    {% else %}
+                        <option value="" disabled>Select Processing Type</option>
+                    {% endif %}
+
+                    {% set processing_types = [
+                        ('text_generation', 'Text Generation'),
+                        ('image_generation', 'Image Generation'),
+                        ('structured_data', 'Structured Data Output (JSON)'),
+                        ('vision_capabilities', 'Vision Capabilities'),
+                        ('speech_to_text', 'Speech-to-Text'),
+                        ('text_to_speech', 'Text-to-Speech')
+                    ] %}
+
+                    {% for value, label in processing_types %}
+                        {% if option == value %}
+                            <option value="{{ value }}" selected>{{ label }}</option>
+                        {% else %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endif %}
+                    {% endfor %}
                 </select>
 
                 <div class="input-container">
                     <div class="text-input-row">
+                        <label for="textInput"></label>
                         <input type="text" name="user_text" id="textInput" placeholder="Enter your text here...">
+
+                        <label for="voiceSelector"></label>
                         <select name="voice_selection" id="voiceSelector" class="voice-selector">
-                            <option value="alloy" {% if voice == 'alloy' %}selected{% endif %}>Alloy</option>
-                            <option value="ash" {% if voice == 'ash' %}selected{% endif %}>Ash</option>
-                            <option value="ballad" {% if voice == 'ballad' %}selected{% endif %}>Ballad</option>
-                            <option value="coral" {% if voice == 'coral' %}selected{% endif %}>Coral</option>
-                            <option value="echo" {% if voice == 'echo' %}selected{% endif %}>Echo</option>
-                            <option value="fable" {% if voice == 'fable' %}selected{% endif %}>Fable</option>
-                            <option value="nova" {% if voice == 'nova' %}selected{% endif %}>Nova</option>
-                            <option value="onyx" {% if voice == 'onyx' %}selected{% endif %}>Onyx</option>
-                            <option value="sage" {% if voice == 'sage' %}selected{% endif %}>Sage</option>
-                            <option value="shimmer" {% if voice == 'shimmer' %}selected{% endif %}>Shimmer</option>
+                            {% set voices = [
+                                ('alloy', 'Alloy'),
+                                ('ash', 'Ash'),
+                                ('ballad', 'Ballad'),
+                                ('coral', 'Coral'),
+                                ('echo', 'Echo'),
+                                ('fable', 'Fable'),
+                                ('nova', 'Nova'),
+                                ('onyx', 'Onyx'),
+                                ('sage', 'Sage'),
+                                ('shimmer', 'Shimmer')
+                            ] %}
+
+                            {% for value, label in voices %}
+                                {% if voice == value %}
+                                    <option value="{{ value }}" selected>{{ label }}</option>
+                                {% else %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                {% endif %}
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="file-upload-area" id="fileUploadArea">
@@ -326,7 +355,7 @@
 
         {% if image %}
         <div class="image-display-area">
-            <img src="{{ url_for('static', filename=image) }}" alt="Generated image">
+            <img src="{{ url_for('static', filename=image) }}?v={{ range(1000000)|random }}" alt="Generated image">
         </div>
         {% endif %}
 
@@ -335,7 +364,7 @@
             <button class="play-audio-btn" onclick="playAudio()">Play Audio</button>
             <div class="audio-controls">
                 <audio id="audioPlayer" preload="auto">
-                    <source src="{{ url_for('static', filename=audio) }}" type="audio/mpeg">
+                    <source src="{{ url_for('static', filename=audio) }}?v={{ range(1000000)|random }}" type="audio/mpeg">
                     Your browser does not support the audio element.
                 </audio>
                 <span id="audioStatus"></span>
@@ -426,6 +455,9 @@
             const audio = document.getElementById('audioPlayer');
             const playBtn = document.querySelector('.play-audio-btn');
             const statusSpan = document.getElementById('audioStatus');
+
+            // Force reload the file before playing
+            audio.load();
 
             if (audio.paused) {
                 audio.play().then(() => {
